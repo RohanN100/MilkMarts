@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import React from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 
-export default function ProductDetails({ cart, setCart }) {
+export default function ProductDetails({ products, cart, setCart, isLoggedIn }) {
   const { id } = useParams();
-  const [product, setProduct] = useState(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch("/products.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const found = data.find((p) => p.id === parseInt(id));
-        setProduct(found);
-      })
-      .catch((err) => console.error("Error loading product:", err));
-  }, [id]);
+  const product = products.find((p) => p.id.toString() === id);
 
-  if (!product) return <p>Loading...</p>;
+  if (!product) return <p style={{ textAlign: "center", marginTop: "20px" }}>Product not found.</p>;
 
   const handleAddToCart = () => {
+    if (!isLoggedIn) {
+      alert("Please login to add items to cart.");
+      navigate("/login");
+      return;
+    }
     setCart([...cart, product]);
     alert(`${product.name} added to cart!`);
   };
